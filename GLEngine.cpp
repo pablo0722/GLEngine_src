@@ -47,7 +47,7 @@ static void keyFuncWrapper(void *ctx, unsigned char key, int x, int y) {
     if(ctx) {
         GLEngine *engine = (GLEngine *) ctx;
 
-        engine->callKeyFunc(ctx, key, x, y);
+        engine->callKeyFunc(engine, key, x, y);
     }
 }
 
