@@ -51,23 +51,46 @@ static void keyFuncWrapper(void *ctx, unsigned char key, int x, int y) {
     }
 }
 
-bool GLEngine::create(const char *title, int posx, int posy, int width, int height) {
-    ws.create(title, posx, posy, width, height);
-    
-    EGLNativeDisplayType display = (EGLNativeDisplayType) ws.getNativeDisplay();
-    EGLNativeWindowType window = (EGLNativeWindowType) ws.getNativeWindow();
-
-    ws.registerKeyFunc(keyFuncWrapper);
-
-    khr.CreateSurfaceAndBindContext(display, window, 0);
+bool GLEngine::create(const char *title, int posx, int posy, int width, int height, GLuint flags) {
+    khr.CreateSurfaceAndBindContext(title, posx, posy, width, height, flags);
 
     gettimeofday(&t1 , &tz);
 
     return true;
 }
 
-void GLEngine::loop() {
-    while(WindowSystem::Event::Delete != ws.getEvents()) {
+void GLEngine::loop(void *ctx) {
+    bool done = false;
+    WindowEvent event;
+
+    while(!done) {
+        khr.getEvent(&event);
+        while(WindowEvent::Type::NoEvent != event.type) {
+            switch (event.type)
+            {
+                case WindowEvent::Type::DeleteEvent: {
+                    done = true;
+                } break;
+
+                case WindowEvent::Type::KeyPressEvent: {
+                    this->keyFunc(ctx, event.keyPressed, event.x, event.y);
+                } break;
+                
+                default: {
+                } break;
+            }
+
+            if(done) {
+                break;
+            }
+
+            khr.getEvent(&event);
+        }
+
+        if(done) {
+            break;
+        }
+
         gettimeofday(&t2, &tz);
         deltatime = (float)(t2.tv_sec - t1.tv_sec + (t2.tv_usec - t1.tv_usec) * 1e-6);
         t1 = t2;
