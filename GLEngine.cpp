@@ -73,7 +73,7 @@ void GLEngine::loop(void *ctx) {
                 } break;
 
                 case WindowEvent::Type::KeyPressEvent: {
-                    this->keyFunc(ctx, event.keyPressed, event.x, event.y);
+                    callKeyFunc(ctx, event.keyPressed, event.x, event.y);
                 } break;
                 
                 default: {
